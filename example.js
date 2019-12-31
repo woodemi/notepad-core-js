@@ -1,10 +1,10 @@
-import {NotepadConnector} from "./src/index.js";
+import {NotepadConnectionState, NotepadConnector} from "./src/index.js";
 
 const notepadConnector = new NotepadConnector();
 
 window.requestDevice = async function () {
     window.notepad = await notepadConnector.requestDevice();
-    console.log('requestDevice', window.notepad);
+    console.log("requestDevice", window.notepad);
 };
 
 window.connect = function (device) {
@@ -12,6 +12,21 @@ window.connect = function (device) {
 };
 
 window.disconnect = function () {
-    console.log('notepadConnector.connectGatt', notepadConnector.connectGatt);
+    console.log("notepadConnector.connectGatt", notepadConnector.connectGatt);
     notepadConnector.disconnect();
+};
+
+notepadConnector.connectionChangeHandler = function (state) {
+    console.log(`handleConnectionChange ${state}`);
+    switch (state) {
+        case NotepadConnectionState.disconnected:
+            console.log(`disconnected`);
+            break;
+        case NotepadConnectionState.connecting:
+            console.log(`connecting`);
+            break;
+        case NotepadConnectionState.connected:
+            console.log(`connected`);
+            break;
+    }
 };
