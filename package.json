@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/woodemi/notepad-core-js#readme",
   "devDependencies": {
+    "babel-eslint": "^10.0.3",
     "eslint": "^6.8.0"
   }
 }
