@@ -1,6 +1,5 @@
 import {NotepadConnectionState} from "./models.js";
-
-const disconnectedEvent = "gattserverdisconnected";
+import {notepadCore} from "./platform/platform-web.js";
 
 const SUFFIX = "ba5e-f4ee-5ca1-eb1e5e4b1ce0";
 
@@ -9,59 +8,40 @@ const CHAR__COMMAND_REQUEST = `57444e02-${SUFFIX}`;
 const CHAR__COMMAND_RESPONSE = CHAR__COMMAND_REQUEST;
 
 class NotepadConnector {
+    constructor() {
+        notepadCore.messageHandler = this.handleMessage.bind(this);
+    }
+
     requestDevice() {
-        return navigator.bluetooth.requestDevice({
+        return notepadCore.requestDevice({
             optionalServices: [SERV__COMMAND],
-            acceptAllDevices: true,
         });
     }
 
-    #connectGatt;
-
     connect(device) {
-        this.connect0(device);
+        notepadCore.connect(device);
         if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connecting);
     }
 
-    async connect0(device) {
-        try {
-            this.#connectGatt = await device.gatt.connect();
-            this.#connectGatt.device.addEventListener(disconnectedEvent, this.handleDisconnectEvent);
-            console.log(`onConnectSuccess ${(this.#connectGatt)}, ${this.#connectGatt.connected}`);
+    disconnect() {
+        notepadCore.disconnect();
+    }
 
+    async handleMessage(message) {
+        console.log(`handleMessage ${message}`);
+        if (message === NotepadConnectionState.connected) {
             await this.configCharacteristics();
             await this.completeConnection();
-
             if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connected);
-        } catch (e) {
-            console.log(`onConnectFail ${e}`);
+        } else if (message === NotepadConnectionState.disconnected) {
             if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
         }
-    }
-
-    disconnect() {
-        if (this.#connectGatt) {
-            this.#connectGatt.disconnect();
-            this.#connectGatt.device.removeEventListener(disconnectedEvent, this.handleDisconnectEvent);
-        }
-        this.#connectGatt = null;
-    }
-
-    handleDisconnectEvent(event) {
-        console.log(`handleDisconnectEvent ${event}`);
-        // FIXME this refer to `BluetoothDevice`
-        // if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
     }
 
     connectionChangeHandler;
 
     async configCharacteristics() {
-        await this.setNotifiable([SERV__COMMAND, CHAR__COMMAND_RESPONSE]);
-    }
-
-    async setNotifiable(serviceCharacteristic) {
-        let characteristic = await getCharacteristic(this.#connectGatt, serviceCharacteristic);
-        characteristic.startNotifications();
+        await notepadCore.setNotifiable([SERV__COMMAND, CHAR__COMMAND_RESPONSE]);
     }
 
     async completeConnection() {
@@ -70,19 +50,9 @@ class NotepadConnector {
     }
 
     async sendRequestAsync(messageHead, serviceCharacteristic, request) {
-        await this.writeValue(serviceCharacteristic, request);
+        await notepadCore.writeValue(serviceCharacteristic, request);
         console.log(`on${messageHead}Send: ${request}`);
     }
-
-    async writeValue(serviceCharacteristic, value) {
-        let characteristic = await getCharacteristic(this.#connectGatt, serviceCharacteristic);
-        await characteristic.writeValue(value);
-    }
-}
-
-async function getCharacteristic(gatt, serviceCharacteristic) {
-    let service = await gatt.getPrimaryService(serviceCharacteristic[0]);
-    return await service.getCharacteristic(serviceCharacteristic[1]);
 }
 
 export default NotepadConnector;
