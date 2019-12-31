@@ -1,47 +1,53 @@
 import {NotepadConnectionState} from "./models.js";
-
-const disconnectedEvent = "gattserverdisconnected";
+import {notepadCore} from "./platform/platform-web.js";
+import NotepadType from "./NotepadType.js";
+import {create, optionalServices} from "./Notepad.js";
 
 class NotepadConnector {
+    constructor() {
+        notepadCore.messageHandler = this.handleMessage.bind(this);
+    }
+
     requestDevice() {
-        return navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
+        return notepadCore.requestDevice({
+            optionalServices: optionalServices,
         });
     }
 
-    #connectGatt;
+    #notepadClient;
+    #notepadType;
 
     connect(device) {
-        const self = this;
-        device.gatt.connect().then((result) => {
-            self.#connectGatt = result;
-            console.log(`onConnectSuccess ${(self.#connectGatt)}, ${self.#connectGatt.connected}`);
-            this.#connectGatt.device.addEventListener(disconnectedEvent, self.handleDisconnectEvent);
-
-            if (self.connectionChangeHandler) self.connectionChangeHandler(NotepadConnectionState.connected);
-        }, (error) => {
-            console.log(`onConnectFail ${error}`);
-            if (self.connectionChangeHandler) self.connectionChangeHandler(NotepadConnectionState.disconnected);
-        });
-
+        this.#notepadClient = create(device);
+        this.#notepadType = new NotepadType(this.#notepadClient);
+        notepadCore.connect(device);
         if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connecting);
     }
 
     disconnect() {
-        if (this.#connectGatt) {
-            this.#connectGatt.disconnect();
-            this.#connectGatt.device.removeEventListener(disconnectedEvent, this.handleDisconnectEvent);
-        }
-        this.#connectGatt = null;
+        this.clean();
+        notepadCore.disconnect();
     }
 
-    handleDisconnectEvent(event) {
-        console.log(`handleDisconnectEvent ${event}`);
-        // FIXME this refer to `BluetoothDevice`
-        // if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
+    async handleMessage(message) {
+        console.log(`handleMessage ${message}`);
+        if (message === NotepadConnectionState.connected) {
+            await this.#notepadType.configCharacteristics();
+            await this.#notepadClient.completeConnection();
+            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connected);
+        } else if (message === NotepadConnectionState.disconnected) {
+            this.clean();
+            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
+        }
     }
 
     connectionChangeHandler;
+
+    // FIXME Listen to connection change
+    clean() {
+        this.#notepadClient = null;
+        this.#notepadType = null;
+    }
 }
 
 export default NotepadConnector;

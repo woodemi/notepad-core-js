@@ -12,7 +12,6 @@ window.connect = function (device) {
 };
 
 window.disconnect = function () {
-    console.log("notepadConnector.connectGatt", notepadConnector.connectGatt);
     notepadConnector.disconnect();
 };
 
