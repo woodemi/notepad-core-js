@@ -1,0 +1,53 @@
+import {NotepadConnectionState} from "./models.js";
+import {notepadCore} from "./platform/platform-web.js";
+import NotepadType from "./NotepadType.js";
+import {create, optionalServices} from "./Notepad.js";
+
+class NotepadConnector {
+    constructor() {
+        notepadCore.messageHandler = this.handleMessage.bind(this);
+    }
+
+    requestDevice() {
+        return notepadCore.requestDevice({
+            optionalServices: optionalServices,
+        });
+    }
+
+    #notepadClient;
+    #notepadType;
+
+    connect(device) {
+        this.#notepadClient = create(device);
+        this.#notepadType = new NotepadType(this.#notepadClient);
+        notepadCore.connect(device);
+        if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connecting);
+    }
+
+    disconnect() {
+        this.clean();
+        notepadCore.disconnect();
+    }
+
+    async handleMessage(message) {
+        console.log(`handleMessage ${message}`);
+        if (message === NotepadConnectionState.connected) {
+            await this.#notepadType.configCharacteristics();
+            await this.#notepadClient.completeConnection();
+            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connected);
+        } else if (message === NotepadConnectionState.disconnected) {
+            this.clean();
+            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
+        }
+    }
+
+    connectionChangeHandler;
+
+    // FIXME Listen to connection change
+    clean() {
+        this.#notepadClient = null;
+        this.#notepadType = null;
+    }
+}
+
+export default NotepadConnector;
