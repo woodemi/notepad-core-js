@@ -15,17 +15,14 @@ window.disconnect = function () {
     notepadConnector.disconnect();
 };
 
-notepadConnector.connectionChangeHandler = function (state) {
-    console.log(`handleConnectionChange ${state}`);
+notepadConnector.connectionChangeHandler = function (client, state) {
+    console.log(`handleConnectionChange ${client}, ${state}`);
     switch (state) {
         case NotepadConnectionState.disconnected:
-            console.log(`disconnected`);
-            break;
-        case NotepadConnectionState.connecting:
-            console.log(`connecting`);
+            window.notepadClient = null;
             break;
         case NotepadConnectionState.connected:
-            console.log(`connected`);
+            window.notepadClient = client;
             break;
     }
 };

@@ -21,7 +21,7 @@ class NotepadConnector {
         this.#notepadClient = create(device);
         this.#notepadType = new NotepadType(this.#notepadClient);
         notepadCore.connect(device);
-        if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connecting);
+        if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.connecting);
     }
 
     disconnect() {
@@ -34,10 +34,10 @@ class NotepadConnector {
         if (message === NotepadConnectionState.connected) {
             await this.#notepadType.configCharacteristics();
             await this.#notepadClient.completeConnection();
-            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connected);
+            if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.connected);
         } else if (message === NotepadConnectionState.disconnected) {
             this.clean();
-            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
+            if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.disconnected);
         }
     }
 
