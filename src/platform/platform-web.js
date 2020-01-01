@@ -26,10 +26,10 @@ class NotepadCoreWeb {
     }
 
     disconnect() {
-        if (this.#connectGatt) {
+        if (this.#connectGatt)
             this.#connectGatt.disconnect();
+        if (this.#connectGatt && this.#connectGatt.device)
             this.#connectGatt.device.removeEventListener(disconnectedEvent, this.handleDisconnectEvent);
-        }
         this.#connectGatt = null;
     }
 
@@ -39,7 +39,7 @@ class NotepadCoreWeb {
             console.log('Probably MEMORY LEAK!');
         }
 
-        if (this.#connectGatt)
+        if (this.#connectGatt && this.#connectGatt.device)
             this.#connectGatt.device.removeEventListener(disconnectedEvent, this.handleDisconnectEvent);
         this.#connectGatt = null;
         if (this.messageHandler) this.messageHandler(NotepadConnectionState.disconnected);
