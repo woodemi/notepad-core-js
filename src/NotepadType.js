@@ -16,6 +16,26 @@ class NotepadType {
         await notepadCore.writeValue(serviceCharacteristic, request);
         console.log(`on${messageHead}Send: ${request}`);
     }
+
+    receiveResponseAsync(messageHead, serviceCharacteristic, predicate) {
+        const [service, characteristic] = serviceCharacteristic;
+        return new Promise(function (resolve, reject) {
+            let filter = function (value) {
+                if (predicate(value)) {
+                    notepadCore.inputValueEmitter.removeListener(characteristic, filter);
+                    console.log(`on${messageHead}Receive: ${characteristic} ${value}`);
+                    resolve(value);
+                }
+            };
+            notepadCore.inputValueEmitter.addListener(characteristic, filter);
+        });
+    }
+
+    async executeCommand(command) {
+        await this.sendRequestAsync("Command", this.#notepadClient.commandRequestCharacteristic, command.request);
+        let value = await this.receiveResponseAsync("Command", this.#notepadClient.commandResponseCharacteristic, command.intercept);
+        return command.handle(value);
+    }
 }
 
 export default NotepadType;

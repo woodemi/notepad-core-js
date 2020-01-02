@@ -1,4 +1,5 @@
 import NotepadClient from "../NotepadClient.js";
+import {WoodemiCommand} from "./Woodemi.js";
 
 const SUFFIX = "ba5e-f4ee-5ca1-eb1e5e4b1ce0";
 
@@ -18,8 +19,16 @@ class WoodemiClient extends NotepadClient {
     }
 
     async completeConnection() {
-        let request = Uint8Array.of(0x01, 0x0A, 0x00, 0x00, 0x00, 0x01);
-        await this.notepadType.sendRequestAsync("Command", this.commandRequestCharacteristic, request);
+        await this.checkAccess();
+    }
+
+    async checkAccess() {
+        let response = await this.notepadType.executeCommand(new WoodemiCommand(
+            Uint8Array.of(0x01, 0x0A, 0x00, 0x00, 0x00, 0x01),
+            (value) => value[0] === 0x02,
+            (value) => value[1],
+        ));
+        console.log(`checkAccess ${response}`);
     }
 }
 
