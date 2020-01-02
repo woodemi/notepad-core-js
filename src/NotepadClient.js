@@ -18,14 +18,19 @@ class NotepadClient {
     notepadType;
 
     async completeConnection() {
-        let [service, characteristic] = this.syncInputCharacteristic;
-        // TODO removeListener
-        this.notepadType.inputValueEmitter.addListener(characteristic, (value) => {
-            console.log(`receiveSyncInput ${value}`);
-        });
+        // TODO Stop receive
+        this.notepadType.receiveSyncInput(function (value) {
+            if (this.syncPointerHandler) this.syncPointerHandler(this._parseSyncData(value));
+        }.bind(this));
     }
 
+    syncPointerHandler;
+
     async setMode(notepadMode) {
+        throw new Error("Unimplemented");
+    }
+
+    _parseSyncData(value) {
         throw new Error("Unimplemented");
     }
 }
