@@ -1,4 +1,5 @@
 import WoodemiClient from "./woodemi/WoodemiClient.js";
+import {NotePenPointer} from "./models.js";
 
 export const optionalServices = WoodemiClient.optionalServices;
 
@@ -19,3 +20,15 @@ export const AccessException = Object.freeze({
     Denied: new Error("Notepad claimed by other user"),
     Unconfirmed: new Error('User does not confirm before timeout'),
 });
+
+export function parseSyncPointer(value) {
+    let byteData = new DataView(value.buffer);
+    return Array.from({length: value.length / 6}, (v, index) => {
+        return new NotePenPointer(
+            byteData.getUint16(index * 6, true),
+            byteData.getUint16(index * 6 + 2, true),
+            -1,
+            byteData.getUint16(index * 6 + 4, true),
+        );
+    });
+}
