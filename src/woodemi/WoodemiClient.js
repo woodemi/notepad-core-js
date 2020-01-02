@@ -9,8 +9,11 @@ const SERV__COMMAND = `57444d01-${SUFFIX}`;
 const CHAR__COMMAND_REQUEST = `57444e02-${SUFFIX}`;
 const CHAR__COMMAND_RESPONSE = CHAR__COMMAND_REQUEST;
 
+const SERV__SYNC = `57444d06-${SUFFIX}`;
+const CHAR__SYNC_INPUT = `57444d07-${SUFFIX}`;
+
 class WoodemiClient extends NotepadClient {
-    static optionalServices = [SERV__COMMAND];
+    static optionalServices = [SERV__COMMAND, SERV__SYNC];
 
     get commandRequestCharacteristic() {
         return [SERV__COMMAND, CHAR__COMMAND_REQUEST];
@@ -18,6 +21,22 @@ class WoodemiClient extends NotepadClient {
 
     get commandResponseCharacteristic() {
         return [SERV__COMMAND, CHAR__COMMAND_RESPONSE];
+    }
+
+    get syncInputCharacteristic() {
+        return [SERV__SYNC, CHAR__SYNC_INPUT];
+    }
+
+    get inputIndicationCharacteristics() {
+        return [
+            this.commandResponseCharacteristic,
+        ];
+    }
+
+    get inputNotificationCharacteristics() {
+        return [
+            this.syncInputCharacteristic,
+        ];
     }
 
     async completeConnection() {
