@@ -1,7 +1,7 @@
 import NotepadClient from "../NotepadClient.js";
 import {WoodemiCommand} from "./Woodemi.js";
 import {NotepadMode} from "../models.js";
-import {AccessException, AccessResult} from "../Notepad.js";
+import {AccessException, AccessResult, parseSyncPointer} from "../Notepad.js";
 
 const SUFFIX = "ba5e-f4ee-5ca1-eb1e5e4b1ce0";
 
@@ -11,6 +11,9 @@ const CHAR__COMMAND_RESPONSE = CHAR__COMMAND_REQUEST;
 
 const SERV__SYNC = `57444d06-${SUFFIX}`;
 const CHAR__SYNC_INPUT = `57444d07-${SUFFIX}`;
+
+const A1_WIDTH = 14800;
+const A1_HEIGHT = 21000;
 
 class WoodemiClient extends NotepadClient {
     static optionalServices = [SERV__COMMAND, SERV__SYNC];
@@ -49,6 +52,8 @@ class WoodemiClient extends NotepadClient {
             default:
                 break;
         }
+
+        await super.completeConnection();
     }
 
     async _checkAccess() {
@@ -77,6 +82,13 @@ class WoodemiClient extends NotepadClient {
         await this.notepadType.executeCommand(new WoodemiCommand(
             Uint8Array.of(0x05, mode)
         ));
+    }
+
+    _parseSyncData(value) {
+        return parseSyncPointer(value).filter((pointer) => {
+            return 0 <= pointer.x && pointer.x <= A1_WIDTH
+                && 0 <= pointer.y && pointer.y <= A1_HEIGHT;
+        });
     }
 }
 
