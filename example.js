@@ -34,6 +34,34 @@ window.setMode = function () {
     window.notepadClient.setMode(NotepadMode.Sync);
 };
 
+const getCanvas = function () {
+    if (!window.canvas) {
+        window.canvas = document.getElementById("canvas");
+    }
+    return window.canvas;
+};
+
+const getScaleRatio = function () {
+    if (!window.scaleRatio) {
+        let rect = getCanvas().getBoundingClientRect();
+        window.scaleRatio = Math.min(rect.width / 14800.0, rect.height / 21000.0);
+    }
+    return window.scaleRatio;
+};
+
 window.handleSyncPointer = function (pointers) {
-    console.log(`handleSyncPointer ${pointers.length}`);
+    let context = getCanvas().getContext("2d");
+    let scaleRatio = getScaleRatio();
+    for (let p of pointers) {
+        let pre = window.prePointer ? window.prePointer.p : 0;
+        if (pre <= 0 && p.p > 0) {
+            context.beginPath();
+            context.moveTo(p.x * scaleRatio, p.y * scaleRatio);
+        } else if (pre > 0 && p.p > 0) {
+            context.lineTo(p.x * scaleRatio, p.y * scaleRatio);
+        } else if (pre > 0 && p.p <= 0) {
+            context.stroke();
+        }
+        window.prePointer = p;
+    }
 };
