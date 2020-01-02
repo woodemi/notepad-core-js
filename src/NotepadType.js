@@ -9,7 +9,12 @@ class NotepadType {
     }
 
     async configCharacteristics() {
-        await notepadCore.setNotifiable(this.#notepadClient.commandResponseCharacteristic);
+        for (let serviceCharacteristic of this.#notepadClient.inputIndicationCharacteristics) {
+            await notepadCore.setNotifiable(serviceCharacteristic);
+        }
+        for (let serviceCharacteristic of this.#notepadClient.inputNotificationCharacteristics) {
+            await notepadCore.setNotifiable(serviceCharacteristic);
+        }
     }
 
     async sendRequestAsync(messageHead, serviceCharacteristic, request) {
