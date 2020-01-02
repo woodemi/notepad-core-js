@@ -11,6 +11,10 @@ class NotepadClient {
 
     async completeConnection() {
     }
+
+    async setMode(notepadMode) {
+        throw new Error("Unimplemented");
+    }
 }
 
 export default NotepadClient;

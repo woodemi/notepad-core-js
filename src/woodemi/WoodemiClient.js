@@ -1,5 +1,6 @@
 import NotepadClient from "../NotepadClient.js";
 import {WoodemiCommand} from "./Woodemi.js";
+import {NotepadMode} from "../models.js";
 import {AccessException, AccessResult} from "../Notepad.js";
 
 const SUFFIX = "ba5e-f4ee-5ca1-eb1e5e4b1ce0";
@@ -50,6 +51,13 @@ class WoodemiClient extends NotepadClient {
             default:
                 throw new Error("Unknown error");
         }
+    }
+
+    async setMode(notepadMode) {
+        let mode = notepadMode === NotepadMode.Sync ? 0x00 : 0x01;
+        await this.notepadType.executeCommand(new WoodemiCommand(
+            Uint8Array.of(0x05, mode)
+        ));
     }
 }
 

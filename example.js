@@ -1,4 +1,5 @@
 import {NotepadConnectionState, NotepadConnector} from "./src/index.js";
+import {NotepadMode} from "./src/models.js";
 
 const notepadConnector = new NotepadConnector();
 
@@ -25,4 +26,8 @@ notepadConnector.connectionChangeHandler = function (client, state) {
             window.notepadClient = client;
             break;
     }
+};
+
+window.setMode = function () {
+    window.notepadClient.setMode(NotepadMode.Sync);
 };
