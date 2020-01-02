@@ -14,6 +14,8 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
-        "semi": ["error", "always"]
+        "semi": ["error", "always"],
+        "no-unused-vars": "warn",
+        "arrow-parens": "error"
     }
 };
