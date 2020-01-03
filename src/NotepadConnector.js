@@ -5,7 +5,7 @@ import {create, optionalServices} from "./Notepad.js";
 
 class NotepadConnector {
     constructor() {
-        notepadCore.messageHandler = this.handleMessage.bind(this);
+        notepadCore.messageHandler = this._handleMessage.bind(this);
     }
 
     requestDevice() {
@@ -21,30 +21,30 @@ class NotepadConnector {
         this.#notepadClient = create(device);
         this.#notepadType = new NotepadType(this.#notepadClient);
         notepadCore.connect(device);
-        if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connecting);
+        if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.connecting);
     }
 
     disconnect() {
-        this.clean();
+        this._clean();
         notepadCore.disconnect();
     }
 
-    async handleMessage(message) {
+    async _handleMessage(message) {
         console.log(`handleMessage ${message}`);
         if (message === NotepadConnectionState.connected) {
             await this.#notepadType.configCharacteristics();
             await this.#notepadClient.completeConnection();
-            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.connected);
+            if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.connected);
         } else if (message === NotepadConnectionState.disconnected) {
-            this.clean();
-            if (this.connectionChangeHandler) this.connectionChangeHandler(NotepadConnectionState.disconnected);
+            this._clean();
+            if (this.connectionChangeHandler) this.connectionChangeHandler(this.#notepadClient, NotepadConnectionState.disconnected);
         }
     }
 
     connectionChangeHandler;
 
     // FIXME Listen to connection change
-    clean() {
+    _clean() {
         this.#notepadClient = null;
         this.#notepadType = null;
     }
