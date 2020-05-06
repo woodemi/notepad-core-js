@@ -1,5 +1,5 @@
-import {NotepadConnectionState, NotepadConnector} from "./src/index.js";
-import {NotepadMode} from "./src/models.js";
+import {NotepadConnectionState, NotepadConnector} from "./core/src/index.js";
+import {NotepadMode} from "./core/src/models.js";
 
 const notepadConnector = new NotepadConnector();
 

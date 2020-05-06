@@ -2,10 +2,10 @@
   "name": "notepad-core",
   "version": "0.2.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "core/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .js src"
+    "lint": "eslint --ext .js core/src"
   },
   "repository": {
     "type": "git",
