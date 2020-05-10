@@ -188,3 +188,5 @@ dist
 # mini program
 !/mini-program/sample/project.config.json
 
+# build dir
+/lib/
