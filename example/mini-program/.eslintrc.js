@@ -1,19 +1,20 @@
 module.exports = {
     "env": {
-        "browser": true,
         "es6": true
     },
     "extends": "eslint:recommended",
     "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly",
+        "App": true,
+        "Page": true,
+        "wx": true,
+        "getApp": true,
         "module": true,
-        "require": true
+        "require": true,
     },
     "parser": "babel-eslint",
     "parserOptions": {
-        "ecmaVersion": 2018,
-        "sourceType": "module"
+        "ecmaVersion": 6,
+        "sourceType": "module",
     },
     "rules": {
         "semi": ["error", "always"],
