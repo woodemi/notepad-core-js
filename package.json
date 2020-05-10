@@ -2,10 +2,12 @@
   "name": "notepad-core",
   "version": "0.2.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .js src"
+    "lint": "eslint --ext .js src",
+    "dev": "chokidar \"src/**/*.js\" -c \"npm run build\"",
+    "build": "npx babel src --out-dir lib"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,13 @@
   },
   "homepage": "https://github.com/woodemi/notepad-core-js#readme",
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "babel-eslint": "^10.0.3",
+    "chokidar-cli": "^2.1.0",
     "eslint": "^6.8.0"
   }
 }
