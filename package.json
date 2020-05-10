@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js src",
-    "dev": "chokidar \"src/**/*.js\" -c \"npm run build\"",
-    "build": "npx babel src --out-dir lib"
+    "dev": "chokidar \"src/**/*.js\" -c \"npm run build-dev\"",
+    "build": "npx babel src --out-dir lib",
+    "build-dev": "npm run build && npx babel src --out-dir example/mini-program/lib"
   },
   "repository": {
     "type": "git",
