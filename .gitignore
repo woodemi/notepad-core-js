@@ -186,7 +186,7 @@ dist
 .tern-port
 
 # mini program
-!/mini-program/sample/project.config.json
+!/example/mini-program/project.config.json
 
 # build dir
 /lib/
