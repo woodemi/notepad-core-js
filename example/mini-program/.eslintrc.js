@@ -9,6 +9,7 @@ module.exports = {
         "wx": true,
         "getApp": true,
         "module": true,
+        "require": true,
     },
     "parser": "babel-eslint",
     "parserOptions": {

@@ -1,52 +1,70 @@
-const app = getApp();
+const {NotepadConnectionState, NotepadConnector} = require("../../lib/index");
+const {NotepadMode} = require("../../lib/models");
+const notepadConnector = new NotepadConnector();
 
 Page({
-  data: {
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
-  },
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    });
-  },
-  onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      });
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = (res) => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        });
-      };
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: (res) => {
-          app.globalData.userInfo = res.userInfo;
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          });
+    data: {},
+    handleSyncPointer: function (pointers) {
+        let context = this.canvas.getContext("2d");
+        for (let p of pointers) {
+            let pre = this.prePointer ? this.prePointer.p : 0;
+            if (pre <= 0 && p.p > 0) {
+                context.beginPath();
+                context.moveTo(p.x * this.scaleRatio, p.y * this.scaleRatio);
+            } else if (pre > 0 && p.p > 0) {
+                context.lineTo(p.x * this.scaleRatio, p.y * this.scaleRatio);
+            } else if (pre > 0 && p.p <= 0) {
+                context.stroke();
+            }
+            this.prePointer = p;
         }
-      });
+    },
+    onLoad: function () {
+        notepadConnector.connectionChangeHandler = function (client, state) {
+            console.log(`handleConnectionChange ${client}, ${state}`);
+            switch (state) {
+                case NotepadConnectionState.disconnected:
+                    if (this.notepadClient) this.notepadClient.syncPointerHandler = null;
+                    this.notepadClient = null;
+                    break;
+                case NotepadConnectionState.connected:
+                    this.notepadClient = client;
+                    this.notepadClient.syncPointerHandler = this.handleSyncPointer;
+                    break;
+            }
+        };
+
+        const query = wx.createSelectorQuery();
+        query.select('#myCanvas')
+          .fields({ node: true, size: true })
+          .exec((res) => {
+              this.canvas = res[0].node;
+              const ctx = this.canvas.getContext('2d');
+              const dpr = wx.getSystemInfoSync().pixelRatio;
+              this.canvas.width = res[0].width * dpr;
+              this.canvas.height = res[0].height * dpr;
+              this.scaleRatio = Math.min(res[0].width / 14800.0, res[0].height / 21000.0);
+              ctx.scale(dpr, dpr);
+          });
+    },
+    bindRequestDevice: function () {
+        this.device = notepadConnector.requestDevice();
+        console.log("requestDevice", this.device);
+    },
+
+    bindConnect: function () {
+        if (!this.device) {
+            wx.showToast({
+                title: '请先调用 requestDevice',
+                icon: 'none',
+            });
+        }
+        notepadConnector.connect(this.device);
+    },
+    bindDisconnect: function () {
+        notepadConnector.disconnect();
+    },
+    bindSetMode: function () {
+        this.notepadClient.setMode(NotepadMode.Sync);
     }
-  },
-  getUserInfo: function(e) {
-    console.log(e);
-    app.globalData.userInfo = e.detail.userInfo;
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
-    });
-  }
 });
