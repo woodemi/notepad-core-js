@@ -1,5 +1,5 @@
-const {NotepadConnectionState, NotepadConnector} = require("../../lib/index");
-const {NotepadMode} = require("../../lib/models");
+import {NotepadConnectionState, NotepadConnector, NotepadMode} from 'notepad-core';
+
 const notepadConnector = new NotepadConnector();
 
 Page({
