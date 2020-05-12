@@ -1,3 +1,7 @@
+import { promisifyAll } from "wx-promise-pro";
+
+promisifyAll();
+
 //app.js
 App({
   onLaunch: function () {
