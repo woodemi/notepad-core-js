@@ -1,14 +1,29 @@
 class NotepadCore {
-    requestDevice() {
-        throw new Error('Unsupported');
+    constructor() {
+        wx.onBluetoothDeviceFound(this.onBluetoothDeviceFound);
+
+        wx.pro.openBluetoothAdapter();
     }
 
-    startScan() {
-        // TODO
+    requestDevice() {
+        throw new Error("Unsupported");
+    }
+
+    async startScan() {
+        console.info("NotepadCore startScan");
+        let { available, discovering } = await wx.pro.getBluetoothAdapterState();
+        if (available && !discovering) {
+            wx.pro.startBluetoothDevicesDiscovery();
+        }
     }
 
     stopScan() {
-        // TODO
+        console.info("NotepadCore stopScan");
+        wx.pro.stopBluetoothDevicesDiscovery();
+    }
+
+    onBluetoothDeviceFound({ devices }) {
+        console.debug(`onBluetoothDeviceFound ${devices.length}`);
     }
 }
 
