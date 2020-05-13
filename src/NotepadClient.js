@@ -1,38 +1,19 @@
-class NotepadClient {
-    get commandRequestCharacteristic() {
-        throw new Error("Unimplemented");
+import { WOODEMI_PREFIX } from "./woodemi/Woodemi.js";
+
+Uint8Array.prototype.startWith = function (prefix) {
+    if (this.length < prefix.length) return false
+  
+    for (let i in prefix) {
+      if (this[i] != prefix[i]) return false
     }
-
-    get commandResponseCharacteristic() {
-        throw new Error("Unimplemented");
-    }
-
-    get syncInputCharacteristic() {
-        throw new Error("Unimplemented");
-    }
-
-    get inputIndicationCharacteristics() {
-        throw new Error("Unimplemented");
-    }
-
-    notepadType;
-
-    async completeConnection() {
-        // TODO Stop receive
-        this.notepadType.receiveSyncInput(function (value) {
-            if (this.syncPointerHandler) this.syncPointerHandler(this._parseSyncData(value));
-        }.bind(this));
-    }
-
-    syncPointerHandler;
-
-    async setMode(notepadMode) {
-        throw new Error("Unimplemented");
-    }
-
-    _parseSyncData(value) {
-        throw new Error("Unimplemented");
-    }
+    return true
 }
 
-export default NotepadClient;
+export default class NotepadClient {
+    static support(scanResult) {
+        if (scanResult.manufacturerData.startWith(WOODEMI_PREFIX)) {
+            return true;
+        }
+        return false;
+    }
+}

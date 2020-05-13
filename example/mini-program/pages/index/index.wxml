@@ -1,3 +1,8 @@
 <!--index.wxml-->
 <button bind:tap="bindStartScan">StartScan</button>
 <button bind:tap="bindStopScan">StopScan</button>
+<view wx:for='{{scanResults}}' style="width: 100%;">
+    <view>{{item.name}}({{item.RSSI}})</view>
+    <view>{{item.deviceId}}</view>
+    <view class='divider' />
+</view>
