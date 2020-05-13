@@ -1,6 +1,9 @@
-class NotepadCore {
-    requestDevice() {
-        // TODO
+export default class NotepadCore {
+    requestDevice(scanOptions) {
+        return navigator.bluetooth.requestDevice({
+            optionalServices: scanOptions.optionalServices,
+            acceptAllDevices: true,
+        });
     }
 
     startScan() {
@@ -11,5 +14,3 @@ class NotepadCore {
         throw new Error("Unsupported");
     }
 }
-
-export const web = new NotepadCore();

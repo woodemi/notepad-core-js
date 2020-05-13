@@ -1,4 +1,4 @@
-import { web } from "./web.js";
-import { miniWechat } from "./mini-wechat.js";
+import NotepadCoreWeb from "./web.js";
+import NotepadCoreWechat from "./mini-wechat.js";
 
-export const notepadCore = wx ? miniWechat : web;
+export const notepadCore = window && window.navigator ? new NotepadCoreWeb() : new NotepadCoreWechat();
