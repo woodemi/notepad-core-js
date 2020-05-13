@@ -1,0 +1,3 @@
+<!--pages/notepad.wxml-->
+<button bind:tap="bindConnect">Connect</button>
+<button bind:tap="bindDisconnect">Disconnect</button>
