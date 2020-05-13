@@ -1,11 +1,11 @@
-class NotepadCore {
+export default class NotepadCore {
     constructor() {
         wx.onBluetoothDeviceFound(this.onBluetoothDeviceFound);
 
         wx.pro.openBluetoothAdapter();
     }
 
-    requestDevice() {
+    requestDevice(scanOptions) {
         throw new Error("Unsupported");
     }
 
@@ -26,5 +26,3 @@ class NotepadCore {
         console.debug(`onBluetoothDeviceFound ${devices.length}`);
     }
 }
-
-export const miniWechat = new NotepadCore();

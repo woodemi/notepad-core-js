@@ -1,9 +1,12 @@
 import { notepadCore } from "./platform/interface.js";
+import { optionalServiceCollection } from "./Notepad.js";
 
 class NotepadConnector {
     requestDevice() {
         console.info('NotepadConnector requestDevice');
-        return notepadCore.requestDevice();
+        return notepadCore.requestDevice({
+            optionalServices: optionalServiceCollection
+        });
     }
 
     startScan() {
