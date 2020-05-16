@@ -10,6 +10,17 @@
     "build": "npx babel src --out-dir lib",
     "build-dev": "npm run build && npx babel src --out-dir example/mini-program/lib"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+      "**/*.js": [
+          "eslint --fix",
+          "git add"
+      ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/woodemi/notepad-core-js.git"
@@ -28,7 +39,9 @@
     "@babel/preset-env": "^7.9.6",
     "babel-eslint": "^10.0.3",
     "chokidar-cli": "^2.1.0",
-    "eslint": "^6.8.0"
+    "eslint": "^6.8.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.2"
   },
   "dependencies": {
     "wx-promise-pro": "^3.2.0"
