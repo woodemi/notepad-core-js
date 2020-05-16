@@ -8,4 +8,4 @@ Page({
       this.data.scanResult = data.scanResult;
     });
   },
-})
+});
