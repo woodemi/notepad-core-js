@@ -1,3 +1,30 @@
 <!--pages/notepad.wxml-->
 <button bind:tap="bindConnect">Connect</button>
 <button bind:tap="bindDisconnect">Disconnect</button>
+<button bind:tap="bindClaimAuth">ClaimAuth</button>
+<button bind:tap="bindDisclaimAuth">DisclaimAuth</button>
+<button bind:tap="bindSetMode">SetMode</button>
+<button bind:tap="bindGetMemoSummary">GetMemoSummary</button>
+<button bind:tap="bindImportMemo">ImportMemo</button>
+<button bind:tap="bindDeleteMemo">DeleteMemo</button>
+<button bind:tap="bindGetDeviceName">GetDeviceName</button>
+设备名称：<input value="{{deviceName}}" bind:input="bindDeviceNameInput"/>
+<button bind:tap="bindSetDeviceName">SetDeviceName</button>
+<button bind:tap="bindGetBatteryInfo">GetBatteryInfo</button>
+<button bind:tap="bindGetDeviceDate">GetDeviceDate</button>
+设备时钟（秒）：<input type="number" value="{{deviceDate}}" bind:input="bindDeviceDateInput"/>
+<button bind:tap="bindSetDeviceDate">SetDeviceDate</button>
+<button bind:tap="bindGetAutoLockTime">GetAutoLockTime</button>
+休眠时长（分）：<input type="number" value="{{autoLockTime}}" bind:input="bindAutoLockTimeInput"/>
+<button bind:tap="bindSetAutoLockTime">SetAutoLockTime</button>
+版本号：<input value="{{upgradePath}}" bind:input="bindUpgradePathInput"/>
+版本号：<input value="{{upgradeVersion}}" bind:input="bindUpgradeVersionInput"/>
+<button bind:tap="bindUpgrade">Upgrade</button>
+笔记范围：
+<block wx:if="{{width && height}}">
+  W:{{width}},H:{{height}}
+</block>
+操作结果：
+<block wx:for="{{results}}">
+  <text>{{results[results.length - index]}}</text>
+</block>
