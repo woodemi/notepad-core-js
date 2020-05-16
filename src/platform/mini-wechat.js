@@ -37,4 +37,52 @@ export default class NotepadCore {
       });
     }
   }
+
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _deviceId
+
+  connect(scanResult) {
+    console.info("NotepadCore connect");
+    // TODO
+    this._deviceId = scanResult.deviceId;
+    wx.pro.createBLEConnection({ deviceId: this._deviceId });
+  }
+
+  disconnect() {
+    console.info("NotepadCore disconnect");
+    wx.pro.closeBLEConnection({ deviceId: this._deviceId });
+    this._deviceId = null;
+  }
+
+  setNotifiable({ serviceId, characteristicId }, state) {
+    return wx.pro.notifyBLECharacteristicValueChange({
+      deviceId: this._deviceId,
+      serviceId,
+      characteristicId,
+      state
+    });
+  }
+
+  async requestMtu(expectedMtu) {
+    // FIXME Android vs iOS
+    await wx.pro.setBLEMTU(expectedMtu);
+    return expectedMtu;
+  }
+
+  readValue({ serviceId, characteristicId }) {
+    return wx.pro.readBLECharacteristicValue({
+      deviceId: this._deviceId,
+      serviceId,
+      characteristicId
+    });
+  }
+
+  async writeValue({ serviceId, characteristicId }, valueArray) {
+    await wx.pro.writeBLECharacteristicValue({
+      deviceId: this._deviceId,
+      serviceId,
+      characteristicId,
+      value: valueArray.buffer
+    });
+  }
 }
