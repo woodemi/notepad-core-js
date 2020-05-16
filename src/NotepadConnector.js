@@ -16,16 +16,51 @@ class NotepadConnector {
 
     startScan() {
         console.info("NotepadConnector startScan");
-        notepadCore.startScan();
+        return notepadCore.startScan();
     }
 
     stopScan() {
         console.info("NotepadConnector stopScan");
-        notepadCore.stopScan();
+        return notepadCore.stopScan();
     }
 
-    // FIXME Class field not supported in npm package for mini-wechat
-    // scanResultHandler;
+    connect(notepadScanResult, authToken) {}
+
+    disconnect() {}
+
+    claimAuth() {}
+
+    disclaimAuth() {}
+
+    setMode(mode) {}
+
+    onReceiveNotePenPointers() {}
+
+    getMemoSummary() {}
+
+    importMemo() {}
+
+    onImportMemoProgress() {}
+
+    deleteMemo() {}
+
+    getDeviceName() {}
+
+    setDeviceName(name) {}
+
+    getBatteryInfo() {}
+
+    getDeviceDate() {}
+
+    setDeviceDate(timestamp) {}
+
+    getAutoLockTime() {}
+
+    setAutoLockTime(duration) {}
+
+    upgrade(path, version) {}
+
+    onUpgradeProgress() {}
 
     _handleMessage(message) {
         console.debug("NotepadConnector _handleMessage", message);
