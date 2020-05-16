@@ -18,6 +18,7 @@ module.exports = {
     "rules": {
         "semi": ["error", "always"],
         "no-unused-vars": "warn",
-        "arrow-parens": "error"
+        "arrow-parens": "error",
+        "indent": ["error", 2]
     }
 };
