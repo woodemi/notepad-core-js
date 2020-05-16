@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js src",
-    "dev": "chokidar \"src/**/*.js\" -c \"npm run build-dev\"",
+    "dev": "chokidar \"src/**/*.js\" -c \"yalc publish && cd example/mini-program && yalc update\"",
     "build": "npx babel src --out-dir lib",
     "build-dev": "npm run build && npx babel src --out-dir example/mini-program/lib"
   },
