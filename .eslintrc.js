@@ -8,7 +8,8 @@ module.exports = {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
         "module": true,
-        "require": true
+        "require": true,
+        "wx": true,
     },
     "parser": "babel-eslint",
     "parserOptions": {
