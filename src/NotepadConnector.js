@@ -16,13 +16,15 @@ class NotepadConnector {
 
     startScan() {
         console.info("NotepadConnector startScan");
-        return notepadCore.startScan();
+        notepadCore.startScan();
     }
 
     stopScan() {
         console.info("NotepadConnector stopScan");
-        return notepadCore.stopScan();
+        notepadCore.stopScan();
     }
+
+    onScanResult() {}
 
     connect(notepadScanResult, authToken) {}
 
