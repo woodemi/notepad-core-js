@@ -1,55 +1,54 @@
 import Head from 'next/head';
 import React from 'react';
-import {NotepadConnector, NotepadMode} from 'notepad-core';
 
-let notepadConnector = new NotepadConnector();
-const AUTH_TOKEN = '';
-let notepadClient;
+let notepadConnector;
 
 export default class Home extends React.Component {
-  async bindRequestDevice() {
-    await notepadConnector.requestDevice();
-  }
+  state = {
+    results: [],
+    device: null,
+    notepadClient: null
+  };
 
-  insertResult(message) {
-    this.setState({
-      results: this.data.results.push(message)
+  componentDidMount() {
+    // Dynamic import, see https://github.com/vercel/next.js/issues/9890#issuecomment-569822580
+    import("notepad-core").then((NotepadCore) => {
+      notepadConnector = NotepadCore.notepadConnector;
+      notepadConnector.onConnectionChange(this.onConnectionChange.bind(this));
     });
   }
 
-  bindConnect() {
-    notepadConnector.connect(this.data.scanResult, AUTH_TOKEN)
-      .then((client, ConnectionState) => {
-        notepadClient = client;
-        notepadClient.onReceiveNotePenPointers((NotePenPointers) => {
-          this.insertResult('接收实时笔迹:' + NotePenPointers);
-        });
-        notepadClient.onImportMemoProgress((progress) => {
-          this.insertResult('导入笔记进度:' + progress);
-        });
-        notepadClient.onUpgradeProgress((progress) => {
-          this.insertResult('升级设备进度:' + progress);
-        });
-        this.setData({
-          width: notepadClient.width,
-          height: notepadClient.height
-        });
-        this.insertResult('连接设备成功:' + ConnectionState);
-      })
-      .catch((err) => {
-        this.insertResult('连接设备失败:' + err);
-      });
+  componentWillUnmount() {
+    notepadConnector.offConnectionChange(this.onConnectionChange);
   }
 
-  bindDisconnect() {
-    notepadConnector.disconnect()
-      .then(() => {
-        this.insertResult('解除连接成功');
-      })
-      .catch((err) => {
-        this.insertResult('解除连接失败:' + err);
-      });
+  onConnectionChange(notepadClient, connectionState) {
+    console.log("onConnectionChange", notepadClient, connectionState);
+    if (connectionState === NotepadConnectionState.Connected) {
+      this.setState({ notepadClient });
+    } else if (connectionState === NotepadConnectionState.Disconnected) {
+      this.setState({ notepadClient: null });
+    }
   }
+
+  bindRequestDevice = async () => {
+    const device = await notepadConnector.requestDevice();
+    this.setState({ device });
+  };
+
+  insertResult(message) {
+    this.setState({
+      results: this.state.results.push(message)
+    });
+  }
+
+  bindConnect = () => {
+    notepadConnector.connect(this.state.device);
+  };
+
+  bindDisconnect = () => {
+    notepadConnector.disconnect();
+  };
 
   bindClaimAuth() {
     notepadConnector.claimAuth()
@@ -224,7 +223,7 @@ export default class Home extends React.Component {
 
   render() {
     let resultsView = [];
-    const results = this.data.results;
+    const results = this.state.results;
     for (let i = 0; i < results.length; i++) {
       resultsView.push(<li>{results[results.length - i]}</li>);
     }

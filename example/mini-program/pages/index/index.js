@@ -1,6 +1,4 @@
-import { NotepadConnector } from 'notepad-core';
-
-const notepadConnector = new NotepadConnector();
+import { notepadConnector } from 'notepad-core';
 
 Page({
   data: {

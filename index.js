@@ -1,6 +1,10 @@
 import NotepadConnector from "./src/NotepadConnector.js";
-import {NotepadMode} from "./src/models";
+import { NotepadConnectionState, NotepadMode } from "./src/models";
+
+const notepadConnector =  new NotepadConnector();
+
 export {
-  NotepadConnector,
+  notepadConnector,
+  NotepadConnectionState,
   NotepadMode,
 };
