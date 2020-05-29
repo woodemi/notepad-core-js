@@ -1,16 +1,32 @@
-import { NotepadConnector, NotepadMode } from 'notepad-core';
-const AUTH_TOKEN = '';
+import { notepadConnector, NotepadConnectionState, NotepadMode } from 'notepad-core';
+
 Page({
   data: {
-    scanResult: null,
-    results: [],
   },
-  props: {},
+  props: {
+    scanResult: null,
+    notepadClient: null
+  },
   onLoad: function () {
     const eventChannel = this.getOpenerEventChannel();
-    eventChannel.on('scanResult', function (data) {
+    eventChannel.on('scanResult', (data) => {
       this.props.scanResult = data.scanResult;
     });
+    
+    notepadConnector.onConnectionChange(this.onConnectionChange.bind(this));
+  },
+
+  onUnload: function() {
+    notepadConnector.offConnectionChange(this.onConnectionChange);
+  },
+
+  onConnectionChange: function(notepadClient, connectionState) {
+    console.log("onConnectionChange", notepadClient, connectionState);
+    if (connectionState === NotepadConnectionState.Connected) {
+      this.props.notepadClient = notepadClient;
+    } else if (connectionState === NotepadConnectionState.Disconnected) {
+      this.props.notepadClient = null;
+    }
   },
 
   insertResult(result) {
@@ -20,41 +36,15 @@ Page({
   },
 
   bindConnect() {
-    NotepadConnector.connect(this.props.scanResult, AUTH_TOKEN)
-      .then((notepadClient, ConnectionState) => {
-        this.props.notepadClient = notepadClient;
-        this.props.notepadClient.onReceiveNotePenPointers((NotePenPointers) => {
-          this.insertResult('接收实时笔迹', NotePenPointers);
-        });
-        this.props.notepadClient.onImportMemoProgress((progress) => {
-          this.insertResult('导入笔记进度', progress);
-        });
-        this.props.notepadClient.onUpgradeProgress((progress) => {
-          this.insertResult('升级设备进度', progress);
-        });
-        this.setData({
-          width: notepadClient.width,
-          height: notepadClient.height,
-        });
-        this.insertResult('连接设备成功', ConnectionState);
-      })
-      .catch((err) => {
-        this.insertResult('连接设备失败', err);
-      });
+    notepadConnector.connect(this.props.scanResult);
   },
 
   bindDisconnect() {
-    NotepadConnector.disconnect()
-      .then(() => {
-        this.insertResult('解除连接成功');
-      })
-      .catch((err) => {
-        this.insertResult('解除连接失败', err);
-      });
+    notepadConnector.disconnect();
   },
 
   bindClaimAuth() {
-    NotepadConnector.claimAuth()
+    notepadConnector.claimAuth()
       .then(() => {
         this.insertResult('绑定设备成功');
       })
@@ -63,7 +53,7 @@ Page({
       });
   },
   bindDisclaimAuth() {
-    NotepadConnector.disclaimAuth()
+    notepadConnector.disclaimAuth()
       .then(() => {
         this.insertResult('解除绑定成功');
       })
@@ -72,7 +62,7 @@ Page({
       });
   },
   bindSetMode() {
-    NotepadConnector.setMode(NotepadMode.Sync)
+    notepadConnector.setMode(NotepadMode.Sync)
       .then(() => {
         this.insertResult('设置Mode成功');
       })
@@ -81,7 +71,7 @@ Page({
       });
   },
   bindGetMemoSummary() {
-    NotepadConnector.getMemoSummary()
+    notepadConnector.getMemoSummary()
       .then((memoSummary) => {
         this.insertResult('获取队列摘要成功', memoSummary);
       })
@@ -90,7 +80,7 @@ Page({
       });
   },
   bindImportMemo() {
-    NotepadConnector.importMemo()
+    notepadConnector.importMemo()
       .then(() => {
         this.insertResult('导入单个离线笔迹成功');
       })
@@ -99,7 +89,7 @@ Page({
       });
   },
   bindDeleteMemo() {
-    NotepadConnector.deleteMemo()
+    notepadConnector.deleteMemo()
       .then(() => {
         this.insertResult('删除单个离线笔迹成功');
       })
@@ -108,7 +98,7 @@ Page({
       });
   },
   bindGetDeviceName() {
-    NotepadConnector.getDeviceName()
+    notepadConnector.getDeviceName()
       .then((deviceName) => {
         this.insertResult('获取设备名称成功', deviceName);
       })
@@ -123,7 +113,7 @@ Page({
   },
 
   bindSetDeviceName() {
-    NotepadConnector.setDeviceName(this.data.deviceName)
+    notepadConnector.setDeviceName(this.data.deviceName)
       .then(() => {
         this.insertResult('设置设备名称成功');
       })
@@ -132,7 +122,7 @@ Page({
       });
   },
   bindGetBatteryInfo() {
-    NotepadConnector.getBatteryInfo()
+    notepadConnector.getBatteryInfo()
       .then((batteryInfo) => {
         this.insertResult('获取电量信息成功', batteryInfo);
       })
@@ -141,7 +131,7 @@ Page({
       });
   },
   bindGetDeviceDate() {
-    NotepadConnector.getDeviceDate()
+    notepadConnector.getDeviceDate()
       .then((deviceDate) => {
         this.insertResult('获取设备时钟成功', deviceDate);
       })
@@ -156,7 +146,7 @@ Page({
     });
   },
   bindSetDeviceDate() {
-    NotepadConnector.setDeviceDate(this.data.deviceDate)
+    notepadConnector.setDeviceDate(this.data.deviceDate)
       .then(() => {
         this.insertResult('设置设备时钟成功');
       })
@@ -165,7 +155,7 @@ Page({
       });
   },
   bindGetAutoLockTime() {
-    NotepadConnector.getAutoLockTime()
+    notepadConnector.getAutoLockTime()
       .then((autoLockTime) => {
         this.insertResult('获取设备自动休眠时长成功', autoLockTime);
       })
@@ -181,7 +171,7 @@ Page({
   },
 
   bindSetAutoLockTime() {
-    NotepadConnector.setAutoLockTime(this.data.autoLockTime)
+    notepadConnector.setAutoLockTime(this.data.autoLockTime)
       .then(() => {
         this.insertResult('设置设备自动休眠时长成功');
       })
@@ -204,7 +194,7 @@ Page({
   },
 
   bindUpgrade() {
-    NotepadConnector.upgrade(this.data.upgradePath, this.data.upgradeVersion)
+    notepadConnector.upgrade(this.data.upgradePath, this.data.upgradeVersion)
       .then(() => {
         this.insertResult('设置设备自动休眠时长成功');
       })

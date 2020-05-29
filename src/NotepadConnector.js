@@ -1,6 +1,7 @@
 import { notepadCore } from "./platform/interface.js";
-import { optionalServiceCollection } from "./Notepad.js";
-import NotepadClient from "./NotepadClient.js";
+import { Notepad } from "./Notepad.js";
+import NotepadType from "./NotepadType.js";
+import { NotepadConnectionState } from "./models.js";
 
 class NotepadConnector {
   constructor() {
@@ -10,7 +11,7 @@ class NotepadConnector {
   requestDevice() {
     console.info("NotepadConnector requestDevice");
     return notepadCore.requestDevice({
-      optionalServices: optionalServiceCollection
+      optionalServices: Notepad.optionalServiceCollection
     });
   }
 
@@ -26,50 +27,67 @@ class NotepadConnector {
 
   onScanResult() {}
 
-  connect(notepadScanResult, authToken) {}
 
-  disconnect() {}
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _notepadClient
+  // _notepadType
 
-  claimAuth() {}
+  connect(scanResult, authToken) {
+    console.info("NotepadConnector connect");
+    this._notepadClient = Notepad.create(scanResult);
+    this._notepadType = new NotepadType(this._notepadClient);
+    notepadCore.connect(scanResult);
+    if (this._connectionChangeHandler) this._connectionChangeHandler(this._notepadClient, NotepadConnectionState.Connecting);
+  }
 
-  disclaimAuth() {}
-
-  setMode(mode) {}
-
-  onReceiveNotePenPointers() {}
-
-  getMemoSummary() {}
-
-  importMemo() {}
-
-  onImportMemoProgress() {}
-
-  deleteMemo() {}
-
-  getDeviceName() {}
-
-  setDeviceName(name) {}
-
-  getBatteryInfo() {}
-
-  getDeviceDate() {}
-
-  setDeviceDate(timestamp) {}
-
-  getAutoLockTime() {}
-
-  setAutoLockTime(duration) {}
-
-  upgrade(path, version) {}
-
-  onUpgradeProgress() {}
+  disconnect() {
+    console.info("NotepadConnector disconnect");
+    this._clean();
+    notepadCore.disconnect();
+  }
 
   _handleMessage(message) {
     console.debug("NotepadConnector _handleMessage", message);
     if (message.name === "scanResult") {
-      if (NotepadClient.support(message.scanResult) && this.scanResultHandler)
+      if (Notepad.support(message.scanResult) && this.scanResultHandler)
         this.scanResultHandler(message.scanResult);
+    } else if (message.name === "connectionState") {
+      this._handleConnectionState(message.connectionState);
     }
+  }
+
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _connectionChangeHandler
+
+  onConnectionChange(connectionChangeHandler) {
+    // TODO addListener
+    this._connectionChangeHandler = connectionChangeHandler;
+  }
+
+  offConnectionChange(connectionChangeHandler) {
+    // TODO removeListener
+    this._connectionChangeHandler = null;
+  }
+
+  async _handleConnectionState({ connected }) {
+    if (connected) {
+      try {
+        await this._notepadType.configCharacteristics();
+        await this._notepadClient.completeConnection((awaitConfirm) => {
+          if (this._connectionChangeHandler) this._connectionChangeHandler(this._notepadClient, NotepadConnectionState.AwaitConfirm);
+        });
+        if (this._connectionChangeHandler) this._connectionChangeHandler(this._notepadClient, NotepadConnectionState.Connected);
+      } catch (e) {
+        this._clean();
+      }
+    } else {
+      this._clean();
+      if (this._connectionChangeHandler) this._connectionChangeHandler(this._notepadClient, NotepadConnectionState.Disconnected);
+    }
+  }
+
+  _clean() {
+    this._notepadClient = null;
   }
 }
 
