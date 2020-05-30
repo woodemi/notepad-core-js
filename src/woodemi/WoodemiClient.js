@@ -7,7 +7,7 @@ import {
   CHAR__SYNC_INPUT,
   WoodemiCommand
 } from "./Woodemi.js";
-import { AccessResult, AccessException } from "../models.js";
+import { AccessResult, AccessException, NotepadMode } from "../models.js";
 
 export const optionalServices = [SERV__COMMAND, SERV__SYNC];
 
@@ -67,6 +67,15 @@ export class WoodemiClient extends NotepadClient {
     default:
       throw new Error("Unknown error");
     }
+  }
+  //#endregion
+
+  //#region SyncInput
+  async setMode(notepadMode) {
+    let mode = notepadMode === NotepadMode.Sync ? 0x00 : 0x01;
+    await this._notepadType.executeCommand(new WoodemiCommand(
+      Uint8Array.of(0x05, mode)
+    ));
   }
   //#endregion
 }

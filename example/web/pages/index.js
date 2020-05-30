@@ -2,18 +2,20 @@ import Head from 'next/head';
 import React from 'react';
 
 let notepadConnector;
+let NotepadConnectionState;
+let NotepadMode;
 
 export default class Home extends React.Component {
   state = {
-    results: [],
-    device: null,
-    notepadClient: null
+    results: []
   };
 
   componentDidMount() {
     // Dynamic import, see https://github.com/vercel/next.js/issues/9890#issuecomment-569822580
     import("notepad-core").then((NotepadCore) => {
       notepadConnector = NotepadCore.notepadConnector;
+      NotepadConnectionState = NotepadCore.NotepadConnectionState;
+      NotepadMode = NotepadCore.NotepadMode;
       notepadConnector.onConnectionChange(this.onConnectionChange.bind(this));
     });
   }
@@ -22,18 +24,21 @@ export default class Home extends React.Component {
     notepadConnector.offConnectionChange(this.onConnectionChange);
   }
 
+  notepadClient = null;
+
   onConnectionChange(notepadClient, connectionState) {
     console.log("onConnectionChange", notepadClient, connectionState);
     if (connectionState === NotepadConnectionState.Connected) {
-      this.setState({ notepadClient });
+      this.notepadClient = notepadClient;
     } else if (connectionState === NotepadConnectionState.Disconnected) {
-      this.setState({ notepadClient: null });
+      this.notepadClient = null;
     }
   }
 
+  device = null;
+
   bindRequestDevice = async () => {
-    const device = await notepadConnector.requestDevice();
-    this.setState({ device });
+    this.device = await notepadConnector.requestDevice();
   };
 
   insertResult(message) {
@@ -43,7 +48,7 @@ export default class Home extends React.Component {
   }
 
   bindConnect = () => {
-    notepadConnector.connect(this.state.device);
+    notepadConnector.connect(this.device);
   };
 
   bindDisconnect = () => {
@@ -70,8 +75,8 @@ export default class Home extends React.Component {
       });
   }
 
-  bindSetMode() {
-    notepadConnector.setMode(NotepadMode.Sync)
+  bindSetMode = () => {
+    this.notepadClient.setMode(NotepadMode.Sync)
       .then(() => {
         this.insertResult('设置Mode成功');
       })

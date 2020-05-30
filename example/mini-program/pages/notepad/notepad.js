@@ -2,15 +2,14 @@ import { notepadConnector, NotepadConnectionState, NotepadMode } from 'notepad-c
 
 Page({
   data: {
+    results: []
   },
-  props: {
-    scanResult: null,
-    notepadClient: null
-  },
+  scanResult: null,
+  notepadClient: null,
   onLoad: function () {
     const eventChannel = this.getOpenerEventChannel();
     eventChannel.on('scanResult', (data) => {
-      this.props.scanResult = data.scanResult;
+      this.scanResult = data.scanResult;
     });
     
     notepadConnector.onConnectionChange(this.onConnectionChange.bind(this));
@@ -23,9 +22,9 @@ Page({
   onConnectionChange: function(notepadClient, connectionState) {
     console.log("onConnectionChange", notepadClient, connectionState);
     if (connectionState === NotepadConnectionState.Connected) {
-      this.props.notepadClient = notepadClient;
+      this.notepadClient = notepadClient;
     } else if (connectionState === NotepadConnectionState.Disconnected) {
-      this.props.notepadClient = null;
+      this.notepadClient = null;
     }
   },
 
@@ -36,7 +35,7 @@ Page({
   },
 
   bindConnect() {
-    notepadConnector.connect(this.props.scanResult);
+    notepadConnector.connect(this.scanResult);
   },
 
   bindDisconnect() {
@@ -62,7 +61,7 @@ Page({
       });
   },
   bindSetMode() {
-    notepadConnector.setMode(NotepadMode.Sync)
+    this.notepadClient.setMode(NotepadMode.Sync)
       .then(() => {
         this.insertResult('设置Mode成功');
       })
