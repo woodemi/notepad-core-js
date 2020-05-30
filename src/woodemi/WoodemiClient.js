@@ -5,9 +5,12 @@ import {
   CHAR__COMMAND_RESPONSE,
   SERV__SYNC,
   CHAR__SYNC_INPUT,
-  WoodemiCommand
+  WoodemiCommand,
+  A1_WIDTH,
+  A1_HEIGHT
 } from "./Woodemi.js";
-import { AccessResult, AccessException, NotepadMode } from "../models.js";
+import { AccessResult, AccessException, parseSyncPointer } from "../utils.js";
+import { NotepadMode } from "../models.js";
 
 export const optionalServices = [SERV__COMMAND, SERV__SYNC];
 
@@ -44,6 +47,8 @@ export class WoodemiClient extends NotepadClient {
     case AccessResult.Unconfirmed:
       throw AccessException.Unconfirmed;
     }
+
+    super.completeConnection(awaitConfirmHandler);
   }
 
   //#region authorization
@@ -76,6 +81,13 @@ export class WoodemiClient extends NotepadClient {
     await this._notepadType.executeCommand(new WoodemiCommand(
       Uint8Array.of(0x05, mode)
     ));
+  }
+
+  _parseSyncData(value) {
+    return parseSyncPointer(value).filter((pointer) => {
+      return 0 <= pointer.x && pointer.x <= A1_WIDTH
+          && 0 <= pointer.y && pointer.y <= A1_HEIGHT;
+    });
   }
   //#endregion
 }

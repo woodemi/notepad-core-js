@@ -113,7 +113,7 @@ export default class NotepadCore {
   _onCharacteristicValueChange(event) {
     const characteristic = event.target;
     const bytes = new Uint8Array(characteristic.value.buffer);
-    console.log(`_onCharacteristicValueChange ${characteristic.uuid}, ${bytes}`);
+    console.debug(`_onCharacteristicValueChange ${characteristic.uuid}, ${bytes}`);
     this._inputValueEmitter.emit(characteristic.uuid, bytes);
   }
 }

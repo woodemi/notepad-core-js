@@ -23,9 +23,19 @@ Page({
     console.log("onConnectionChange", notepadClient, connectionState);
     if (connectionState === NotepadConnectionState.Connected) {
       this.notepadClient = notepadClient;
+      if (this.notepadClient) {
+        this.notepadClient.onSyncPointerReceive(this.onSyncPointerReceive.bind(this));
+      }
     } else if (connectionState === NotepadConnectionState.Disconnected) {
+      if (this.notepadClient) {
+        this.notepadClient.offSyncPointerReceive(this.onSyncPointerReceive.bind(this));
+      }
       this.notepadClient = null;
     }
+  },
+
+  onSyncPointerReceive(pointers) {
+    console.log("onSyncPointerReceive", pointers.length);
   },
 
   insertResult(result) {

@@ -30,9 +30,19 @@ export default class Home extends React.Component {
     console.log("onConnectionChange", notepadClient, connectionState);
     if (connectionState === NotepadConnectionState.Connected) {
       this.notepadClient = notepadClient;
+      if (this.notepadClient) {
+        this.notepadClient.onSyncPointerReceive(this.onSyncPointerReceive.bind(this));
+      }
     } else if (connectionState === NotepadConnectionState.Disconnected) {
+      if (this.notepadClient) {
+        this.notepadClient.offSyncPointerReceive(this.onSyncPointerReceive);
+      }
       this.notepadClient = null;
     }
+  }
+
+  onSyncPointerReceive(pointers) {
+    console.log("onSyncPointerReceive", pointers.length);
   }
 
   device = null;
@@ -227,10 +237,10 @@ export default class Home extends React.Component {
   }
 
   render() {
-    let resultsView = [];
+    let resultsview = [];
     const results = this.state.results;
     for (let i = 0; i < results.length; i++) {
-      resultsView.push(<li>{results[results.length - i]}</li>);
+      resultsview.push(<li>{results[results.length - i]}</li>);
     }
     return (
       <div className="container">
@@ -265,7 +275,7 @@ export default class Home extends React.Component {
                       笔记范围：
                       W:{this.state.width || '未知'},H:{this.state.height || '未知'}
                       操作结果：
-            <resultsView/>
+            <resultsview />
           </div>
         </main>
         <style jsx>{`

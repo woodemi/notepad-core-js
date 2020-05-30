@@ -1,5 +1,5 @@
 import { notepadCore } from "./platform/interface.js";
-import { Notepad } from "./Notepad.js";
+import NotepadClientFactory from "./NotepadClientFactory.js";
 import NotepadType from "./NotepadType.js";
 import { NotepadConnectionState } from "./models.js";
 
@@ -11,7 +11,7 @@ class NotepadConnector {
   requestDevice() {
     console.info("NotepadConnector requestDevice");
     return notepadCore.requestDevice({
-      optionalServices: Notepad.optionalServiceCollection
+      optionalServices: NotepadClientFactory.optionalServiceCollection
     });
   }
 
@@ -34,7 +34,7 @@ class NotepadConnector {
 
   connect(scanResult, authToken) {
     console.info("NotepadConnector connect");
-    this._notepadClient = Notepad.create(scanResult);
+    this._notepadClient = NotepadClientFactory.create(scanResult);
     this._notepadType = new NotepadType(this._notepadClient);
     notepadCore.connect(scanResult);
     if (this._connectionChangeHandler) this._connectionChangeHandler(this._notepadClient, NotepadConnectionState.Connecting);
@@ -49,7 +49,7 @@ class NotepadConnector {
   _handleMessage(message) {
     console.debug("NotepadConnector _handleMessage", message);
     if (message.name === "scanResult") {
-      if (Notepad.support(message.scanResult) && this.scanResultHandler)
+      if (NotepadClientFactory.support(message.scanResult) && this.scanResultHandler)
         this.scanResultHandler(message.scanResult);
     } else if (message.name === "connectionState") {
       this._handleConnectionState(message.connectionState);

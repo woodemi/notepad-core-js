@@ -42,4 +42,10 @@ export default class NotepadType {
     const value = await this.receiveResponseAsync("Command", this._notepadClient.commandResponseCharacteristic, command.intercept);
     return command.handle(value);
   }
+
+  receiveSyncInput(receiver) {
+    const { serviceId, characteristicId } = this._notepadClient.syncInputCharacteristic;
+    // TODO removeListener
+    notepadCore.inputValueEmitter.addListener(characteristicId, receiver);
+  }
 }
