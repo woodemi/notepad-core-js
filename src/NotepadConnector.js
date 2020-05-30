@@ -25,8 +25,18 @@ class NotepadConnector {
     notepadCore.stopScan();
   }
 
-  onScanResult() {}
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _scanResultReceiver
 
+  onScanResult(scanResultReceiver) {
+    // TODO addListener
+    this._scanResultReceiver = scanResultReceiver;
+  }
+
+  offScanResult(scanResultReceiver) {
+    // TODO addListener
+    this._scanResultReceiver = null;
+  }
 
   // FIXME Class field not supported in npm package for mini-wechat
   // _notepadClient
@@ -49,8 +59,9 @@ class NotepadConnector {
   _handleMessage(message) {
     console.debug("NotepadConnector _handleMessage", message);
     if (message.name === "scanResult") {
-      if (NotepadClientFactory.support(message.scanResult) && this.scanResultHandler)
-        this.scanResultHandler(message.scanResult);
+      if (NotepadClientFactory.support(message.scanResult)) {
+        if (this._scanResultReceiver) this._scanResultReceiver(message.scanResult);
+      }
     } else if (message.name === "connectionState") {
       this._handleConnectionState(message.connectionState);
     }

@@ -5,7 +5,10 @@ Page({
     scanResults: []
   },
   onLoad: function () {
-    notepadConnector.scanResultHandler = this.handleScanResult.bind(this);
+    notepadConnector.onScanResult(this.onScanResult.bind(this));
+  },
+  onUnload: function () {
+    notepadConnector.offScanResult(this.onScanResult);
   },
 
   bindStartScan: function () {
@@ -14,7 +17,7 @@ Page({
   bindStopScan: function () {
     notepadConnector.stopScan();
   },
-  handleScanResult: function(scanResult) {
+  onScanResult: function(scanResult) {
     this.data.scanResults.push(scanResult);
     this.setData({ scanResults: this.data.scanResults });
   },
