@@ -88,6 +88,7 @@ class NotepadConnector {
 
   _clean() {
     this._notepadClient = null;
+    this._notepadType = null;
   }
 }
 
