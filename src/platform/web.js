@@ -59,8 +59,14 @@ export default class NotepadCore {
 
   disconnect() {
     console.info("NotepadCore disconnect");
-    this._connectGatt.device.removeEventListener(disconnectEvent, this._handleDisconnectEvent);
-    this.deviceId = null;
+    if (this._connectGatt) {
+      if (this._connectGatt.device) {
+        this._connectGatt.device.removeEventListener(disconnectEvent, this._handleDisconnectEvent);
+      }
+      this._connectGatt.disconnect();
+    }
+
+    this._connectGatt = null;
   }
 
   _handleDisconnectEvent(event) {
