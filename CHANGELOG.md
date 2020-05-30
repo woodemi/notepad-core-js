@@ -1,3 +1,9 @@
+## [0.3.0] - 2020-5-31
+- Support mini-program on Wechat
+- Add `startScan`, `stopScan` & `on/offScanResult` to `NotepadConnector` only for mini-program on Wechat
+- [**BREAKING CHANGE**] Refactor `connectionChangeHandler` to `on/offConnectionChange`
+- [**BREAKING CHANGE**] Refator `syncPointerHandler` to `on/offScanResult`
+
 ## [0.2.0] - 2020-1-3
 
 ### NotepadConnector

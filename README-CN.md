@@ -9,6 +9,7 @@
 
 # 功能
 - 扫描设备
+- 连接设备
 - 接收实时笔迹
 
 ## 扫描设备
@@ -20,22 +21,38 @@ let device = notepadConnector.requestDevice();
 console.log(`requestDevice ${device}`);
 ```
 
-### WeChat-mini
-
-TODO
-
-## Connect notepad
-
-连接从`notepadConnector.scanResultStream`中扫描到的`result` 
+### Mini-program on Wechat
 
 ```js
-notepadConnector.connectionChangeHandler = function (client, state) {
-  console.log(`handleConnectionChange ${client} ${state}`);
+let scanResultReceiver = function (scanResult) {
+  console.log(`onScanResult ${scanResult}`);
 };
+notepadConnector.onScanResult(scanResultReceiver);
 
-notepadConnector.connect(result);
+notepadConnector.startScan();
+// ...
+notepadConnector.stopScan();
+
+notepadConnector.offScanResult(scanResultReceiver);
+```
+
+## 连接设备
+
+连接从`notepadConnector.requestDevice()`中获取的`device`
+
+或从`notepadConnector.scanResultStream`中扫描到的`result`
+
+```js
+let connectionChangeHandler = function (notepadClient, connectionState) {
+  console.log(`onConnectionChange ${notepadClient}, ${connectionState}`);
+};
+notepadConnector.onConnectionChange(connectionChangeHandler);
+
+notepadConnector.connect(obj); // obj = device/scanResult
 // ...
 notepadConnector.disconnect();
+
+notepadConnector.offConnectionChange(connectionChangeHandler);
 ```
 
 ## 接收实时笔迹
@@ -57,12 +74,16 @@ await _notepadClient.setMode(NotepadMode.Sync);
 console.log("setMode complete");
 ```
 
-### NotepadClient#handleSyncPointer
+### NotepadClient#onSyncPointerReceive
 
 当`NotepadMode.Sync`时，接收`NotePenPointer`
 
 ```js
-_notepadClient.handleSyncPointer = function (pointers) {
-  console.log(`handleSyncPointer ${pointers.length}`);
+let syncPointerReceiver = function (pointers) {
+  console.log(`onSyncPointerReceive ${pointers.length}`);
 };
+
+_notepadClient.onSyncPointerReceive(syncPointerReceiver);
+// ...
+_notepadClient.offSyncPointerReceive(syncPointerReceiver);
 ```
