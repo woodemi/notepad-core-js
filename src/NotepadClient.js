@@ -21,4 +21,10 @@ export default class NotepadClient {
   async completeConnection(awaitConfirmHandler) {
     throw new Error("Unimplemented");
   }
+
+  //#region SyncInput
+  async setMode(notepadMode) {
+    throw new Error("Unimplemented");
+  }
+  //#endregion
 }
