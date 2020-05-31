@@ -12,11 +12,11 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
       - run: |
-        npx yalc publish && cd example/web && npx yalc update
-        npm install && npm run build && npm run export
+          npx yalc publish && cd example/web && npx yalc update
+          npm install && npm run build && npm run export
       - uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN_IN_REPO }}
           BASE_BRANCH: master # The branch the action should deploy from.
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: . # The folder the action should deploy.
+          FOLDER: example/web/out # The folder the action should deploy.
