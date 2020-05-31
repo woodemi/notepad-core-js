@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
-      - run: npm install
+      - run: |
+        npx yalc publish && cd example/web && npx yalc update
+        npm install && npm run build && npm run export
       - uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN_IN_REPO }}

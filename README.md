@@ -9,6 +9,8 @@ Flutter plugin for connect & operate on smart notepad
 
 # Usage
 - Scan notepad
+- Connect notepad
+- Sync notepen pointer
 
 ## Scan notepad
 
@@ -19,25 +21,41 @@ let device = notepadConnector.requestDevice();
 console.log(`requestDevice ${device}`);
 ```
 
-### WeChat-mini
+### Mini-program on Wechat
 
-TODO
+```js
+let scanResultReceiver = function (scanResult) {
+  console.log(`onScanResult ${scanResult}`);
+};
+notepadConnector.onScanResult(scanResultReceiver);
+
+notepadConnector.startScan();
+// ...
+notepadConnector.stopScan();
+
+notepadConnector.offScanResult(scanResultReceiver);
+```
 
 ## Connect notepad
 
-Connect to `result`, received from `notepadConnector.scanResultStream`
+Connect to `device` requested from `notepadConnector.requestDevice()`
+
+or `scanResult` received from `notepadConnector.onScanResult`
 
 ```js
-notepadConnector.connectionChangeHandler = function (client, state) {
-  console.log(`handleConnectionChange ${client} ${state}`);
+let connectionChangeHandler = function (notepadClient, connectionState) {
+  console.log(`onConnectionChange ${notepadClient}, ${connectionState}`);
 };
+notepadConnector.onConnectionChange(connectionChangeHandler);
 
-notepadConnector.connect(result);
+notepadConnector.connect(obj); // obj = device/scanResult
 // ...
 notepadConnector.disconnect();
+
+notepadConnector.offConnectionChange(connectionChangeHandler);
 ```
 
-## 接收实时笔迹
+## Sync notepen pointer
 
 ### NotepadClient#setMode
 
@@ -56,12 +74,16 @@ await _notepadClient.setMode(NotepadMode.Sync);
 console.log("setMode complete");
 ```
 
-### NotepadClient#handleSyncPointer
+### NotepadClient#onSyncPointerReceive
 
 Receive `NotePenPointer`s in `NotepadMode.Sync`
 
 ```js
-_notepadClient.handleSyncPointer = function (pointers) {
-  console.log(`handleSyncPointer ${pointers.length}`);
+let syncPointerReceiver = function (pointers) {
+  console.log(`onSyncPointerReceive ${pointers.length}`);
 };
+
+_notepadClient.onSyncPointerReceive(syncPointerReceiver);
+// ...
+_notepadClient.offSyncPointerReceive(syncPointerReceiver);
 ```

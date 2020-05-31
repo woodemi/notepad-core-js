@@ -1,38 +1,52 @@
-class NotepadClient {
-    get commandRequestCharacteristic() {
-        throw new Error("Unimplemented");
-    }
+export default class NotepadClient {
+  get commandRequestCharacteristic() {
+    throw new Error("Unimplemented");
+  }
 
-    get commandResponseCharacteristic() {
-        throw new Error("Unimplemented");
-    }
+  get commandResponseCharacteristic() {
+    throw new Error("Unimplemented");
+  }
 
-    get syncInputCharacteristic() {
-        throw new Error("Unimplemented");
-    }
+  get inputIndicationCharacteristics() {
+    throw new Error("Unimplemented");
+  }
 
-    get inputIndicationCharacteristics() {
-        throw new Error("Unimplemented");
-    }
+  get inputNotificationCharacteristics() {
+    throw new Error("Unimplemented");
+  }
 
-    notepadType;
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _notepadType
 
-    async completeConnection() {
-        // TODO Stop receive
-        this.notepadType.receiveSyncInput(function (value) {
-            if (this.syncPointerHandler) this.syncPointerHandler(this._parseSyncData(value));
-        }.bind(this));
-    }
+  async completeConnection(awaitConfirmHandler) {
+    // TODO Stop receive
+    this._notepadType.receiveSyncInput(function (value) {
+      if (this._syncPointerReceiver) {
+        this._syncPointerReceiver(this._parseSyncData(value));
+      }
+    }.bind(this));
+  }
 
-    syncPointerHandler;
+  //#region SyncInput
+  async setMode(notepadMode) {
+    throw new Error("Unimplemented");
+  }
 
-    async setMode(notepadMode) {
-        throw new Error("Unimplemented");
-    }
+  _parseSyncData(value) {
+    throw new Error("Unimplemented");
+  }
 
-    _parseSyncData(value) {
-        throw new Error("Unimplemented");
-    }
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _syncPointerReceiver
+
+  onSyncPointerReceive(syncPointerReceiver) {
+    // TODO addListener
+    this._syncPointerReceiver = syncPointerReceiver;
+  }
+
+  offSyncPointerReceive(syncPointerReceiver) {
+    // TODO removeListener
+    this._syncPointerReceiver = null;
+  }
+  //#endregion
 }
-
-export default NotepadClient;

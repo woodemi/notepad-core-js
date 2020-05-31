@@ -184,3 +184,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# mini program
+!/example/mini-program/project.config.json
+
+# build dir
+/lib/

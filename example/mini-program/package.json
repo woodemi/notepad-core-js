@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "notepad-core": "file:.yalc/notepad-core"
+  }
+}
