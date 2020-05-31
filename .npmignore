@@ -1,1 +1,9 @@
+.babelrc
+
+.eslintrc.js
+
 example/
+
+.github/
+
+.yalcignore
