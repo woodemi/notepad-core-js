@@ -1,30 +1,23 @@
 import NotepadClient from "../NotepadClient.js";
-import {
-  SERV__COMMAND,
-  CHAR__COMMAND_REQUEST,
-  CHAR__COMMAND_RESPONSE,
-  SERV__SYNC,
-  CHAR__SYNC_INPUT,
-  WoodemiCommand,
-  A1_WIDTH,
-  A1_HEIGHT
-} from "./Woodemi.js";
+import * as Woodemi from "./Woodemi.js";
 import { AccessResult, AccessException, parseSyncPointer } from "../utils.js";
 import { NotepadMode } from "../models.js";
 
-export const optionalServices = [SERV__COMMAND, SERV__SYNC];
+export const optionalServices = [Woodemi.SERV__COMMAND, Woodemi.SERV__SYNC];
+
+const WoodemiCommand = Woodemi.WoodemiCommand;
 
 export class WoodemiClient extends NotepadClient {
   get commandRequestCharacteristic() {
-    return { serviceId: SERV__COMMAND, characteristicId: CHAR__COMMAND_REQUEST };
+    return { serviceId: Woodemi.SERV__COMMAND, characteristicId: Woodemi.CHAR__COMMAND_REQUEST };
   }
 
   get commandResponseCharacteristic() {
-    return { serviceId: SERV__COMMAND, characteristicId: CHAR__COMMAND_RESPONSE };
+    return { serviceId: Woodemi.SERV__COMMAND, characteristicId: Woodemi.CHAR__COMMAND_RESPONSE };
   }
 
   get syncInputCharacteristic() {
-    return { serviceId: SERV__SYNC, characteristicId: CHAR__SYNC_INPUT };
+    return { serviceId: Woodemi.SERV__SYNC, characteristicId: Woodemi.CHAR__SYNC_INPUT };
   }
 
   get inputIndicationCharacteristics() {
@@ -85,8 +78,8 @@ export class WoodemiClient extends NotepadClient {
 
   _parseSyncData(value) {
     return parseSyncPointer(value).filter((pointer) => {
-      return 0 <= pointer.x && pointer.x <= A1_WIDTH
-          && 0 <= pointer.y && pointer.y <= A1_HEIGHT;
+      return 0 <= pointer.x && pointer.x <= Woodemi.A1_WIDTH
+          && 0 <= pointer.y && pointer.y <= Woodemi.A1_HEIGHT;
     });
   }
   //#endregion
