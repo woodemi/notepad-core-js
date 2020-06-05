@@ -1,13 +1,23 @@
 import NotepadClient from "../NotepadClient.js";
 import * as Woodemi from "./Woodemi.js";
 import { AccessResult, AccessException, parseSyncPointer } from "../utils.js";
-import { NotepadMode } from "../models.js";
+import { NotepadMode, NotePenPointer } from "../models.js";
 
 export const optionalServices = [Woodemi.SERV__COMMAND, Woodemi.SERV__SYNC];
 
 const WoodemiCommand = Woodemi.WoodemiCommand;
 
 export class WoodemiClient extends NotepadClient {
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _woodemiType
+
+  constructor(data) {
+    super();
+    const type = data.slice(3, 5);
+    const isCompact = type.startWith(Woodemi.UGEE_CN) || type.startWith(Woodemi.UGEE_GLOBAL);
+    this._woodemiType = isCompact ? Woodemi.typeA1 : Woodemi.typeA1P;
+  }
+
   get commandRequestCharacteristic() {
     return { serviceId: Woodemi.SERV__COMMAND, characteristicId: Woodemi.CHAR__COMMAND_REQUEST };
   }
@@ -77,9 +87,12 @@ export class WoodemiClient extends NotepadClient {
   }
 
   _parseSyncData(value) {
-    return parseSyncPointer(value).filter((pointer) => {
-      return 0 <= pointer.x && pointer.x <= Woodemi.A1_WIDTH
-          && 0 <= pointer.y && pointer.y <= Woodemi.A1_HEIGHT;
+    return parseSyncPointer(value).map((pointer) => {
+      const type = this._woodemiType;
+      const x = (Math.max(type.left, Math.min(pointer.x, type.right)) - type.left) / type.scale;
+      const y = (Math.max(type.top, Math.min(pointer.y, type.bottom)) - type.top) / type.scale;
+      const p = pointer.p / type.pScale;
+      return new NotePenPointer(Math.trunc(x), Math.trunc(y), pointer.t, Math.trunc(p));
     });
   }
   //#endregion

@@ -11,8 +11,49 @@ export const CHAR__COMMAND_RESPONSE = CHAR__COMMAND_REQUEST;
 export const SERV__SYNC = `57444d06-${SUFFIX}`;
 export const CHAR__SYNC_INPUT = `57444d07-${SUFFIX}`;
 
-export const A1_WIDTH = 14800;
-export const A1_HEIGHT = 21000;
+export const UGEE_CN = new Uint8Array([0x41, 0x35]);
+export const UGEE_GLOBAL = new Uint8Array([0x41, 0x36]);
+export const EMRIGHT_CN = new Uint8Array([0x41, 0x37]);
+
+/**
+ * +---A1P--+
+ * |        |
+ * |  +A1+  |
+ * |  |  |  |
+ * |  |  |  |
+ * |  +--+  |
+ * |        |
+ * +--------+
+ */
+class WoodemiType {
+  constructor(widthOutline, heightOutline, scale, widthPadding, heightPadding, pScale) {
+    this.widthOutline = widthOutline;
+    this.heightOutline = heightOutline;
+    this.scale = scale;
+    this.widthPadding = widthPadding;
+    this.heightPadding = heightPadding;
+    this.pScale = pScale;
+  }
+
+  get left() {
+    return this.widthPadding;
+  }
+
+  get right() {
+    return this.widthOutline - this.widthPadding;
+  }
+
+  get top() {
+    return this.heightPadding;
+  }
+
+  get bottom() {
+    return this.heightOutline - this.heightPadding;
+  }
+}
+
+export const typeA1 = new WoodemiType(14800, 21000, 1, 0, 0, 1);
+export const typeA1P = new WoodemiType(30000, 42400, 2, 200, 200, 4);
 
 const getDefaultIntercept = function (request) {
   return (value) => value[0] === 0x07 && value[1] === request[0];
