@@ -1,30 +1,33 @@
 import NotepadClient from "../NotepadClient.js";
-import {
-  SERV__COMMAND,
-  CHAR__COMMAND_REQUEST,
-  CHAR__COMMAND_RESPONSE,
-  SERV__SYNC,
-  CHAR__SYNC_INPUT,
-  WoodemiCommand,
-  A1_WIDTH,
-  A1_HEIGHT
-} from "./Woodemi.js";
+import * as Woodemi from "./Woodemi.js";
 import { AccessResult, AccessException, parseSyncPointer } from "../utils.js";
-import { NotepadMode } from "../models.js";
+import { NotepadMode, NotePenPointer } from "../models.js";
 
-export const optionalServices = [SERV__COMMAND, SERV__SYNC];
+export const optionalServices = [Woodemi.SERV__COMMAND, Woodemi.SERV__SYNC];
+
+const WoodemiCommand = Woodemi.WoodemiCommand;
 
 export class WoodemiClient extends NotepadClient {
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _woodemiType
+
+  constructor(data) {
+    super();
+    const type = data.slice(3, 5);
+    const isCompact = type.startWith(Woodemi.UGEE_CN) || type.startWith(Woodemi.UGEE_GLOBAL);
+    this._woodemiType = isCompact ? Woodemi.typeA1 : Woodemi.typeA1P;
+  }
+
   get commandRequestCharacteristic() {
-    return { serviceId: SERV__COMMAND, characteristicId: CHAR__COMMAND_REQUEST };
+    return { serviceId: Woodemi.SERV__COMMAND, characteristicId: Woodemi.CHAR__COMMAND_REQUEST };
   }
 
   get commandResponseCharacteristic() {
-    return { serviceId: SERV__COMMAND, characteristicId: CHAR__COMMAND_RESPONSE };
+    return { serviceId: Woodemi.SERV__COMMAND, characteristicId: Woodemi.CHAR__COMMAND_RESPONSE };
   }
 
   get syncInputCharacteristic() {
-    return { serviceId: SERV__SYNC, characteristicId: CHAR__SYNC_INPUT };
+    return { serviceId: Woodemi.SERV__SYNC, characteristicId: Woodemi.CHAR__SYNC_INPUT };
   }
 
   get inputIndicationCharacteristics() {
@@ -84,9 +87,12 @@ export class WoodemiClient extends NotepadClient {
   }
 
   _parseSyncData(value) {
-    return parseSyncPointer(value).filter((pointer) => {
-      return 0 <= pointer.x && pointer.x <= A1_WIDTH
-          && 0 <= pointer.y && pointer.y <= A1_HEIGHT;
+    return parseSyncPointer(value).map((pointer) => {
+      const type = this._woodemiType;
+      const x = (Math.max(type.left, Math.min(pointer.x, type.right)) - type.left) / type.scale;
+      const y = (Math.max(type.top, Math.min(pointer.y, type.bottom)) - type.top) / type.scale;
+      const p = pointer.p / type.pScale;
+      return new NotePenPointer(Math.trunc(x), Math.trunc(y), pointer.t, Math.trunc(p));
     });
   }
   //#endregion

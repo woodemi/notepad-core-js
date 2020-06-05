@@ -17,7 +17,7 @@ export default class NotepadClientFactory {
 
   static create(scanResult) {
     // FIXME Support both native & web
-    return new WoodemiClient();
+    return new WoodemiClient(scanResult.manufacturerData);
   }
 
   static get optionalServiceCollection() {
