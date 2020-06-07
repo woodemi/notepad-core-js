@@ -51,6 +51,20 @@ export default class Home extends React.Component {
     this.device = await notepadConnector.requestDevice();
   };
 
+  bindStartScan = async () => {
+    notepadConnector.onScanResult(this.onScanResult.bind(this));
+    notepadConnector.startScan();
+  };
+
+  bindStopScan = async () => {
+    notepadConnector.stopScan();
+    notepadConnector.offScanResult(this.onScanResult);
+  };
+
+  onScanResult(scanResult) {
+    console.log("onScanResult", scanResult);
+  }
+
   insertResult(message) {
     this.setState({
       results: this.state.results.push(message)
@@ -251,6 +265,8 @@ export default class Home extends React.Component {
         <main>
           <div className="grid">
             <button onClick={this.bindRequestDevice}>RequestDevice</button>
+            <button onClick={this.bindStartScan}>StartScan</button>
+            <button onClick={this.bindStopScan}>StopScan</button>
             <button onClick={this.bindConnect}>Connect</button>
             <button onClick={this.bindDisconnect}>Disconnect</button>
             <button onClick={this.bindClaimAuth}>ClaimAuth</button>
