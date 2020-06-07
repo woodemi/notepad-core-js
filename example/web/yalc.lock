@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "notepad-core": {
-      "signature": "e8d27d3c299e5cc3146dfbdfdf49b04d",
-      "file": true
-    }
-  }
-}
