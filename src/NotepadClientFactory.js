@@ -12,7 +12,7 @@ Uint8Array.prototype.startWith = function (prefix) {
 
 export default class NotepadClientFactory {
   static support(scanResult) {
-    return scanResult.manufacturerData.startWith(WOODEMI_PREFIX);
+    return scanResult.manufacturerData && scanResult.manufacturerData.startWith(WOODEMI_PREFIX);
   }
 
   static create(scanResult) {

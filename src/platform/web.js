@@ -2,6 +2,17 @@ import EventEmitter from "../events.js";
 
 const disconnectEvent = "gattserverdisconnected";
 const valueChangeEvent = "characteristicvaluechanged";
+const advertiseReceiveEvent = "advertisementreceived";
+
+Number.prototype.toByteArray = function (byteLength, littleEndian = true) {
+  let array = [];
+  for (let i = 0; i < byteLength; i++) {
+    const shift = 8 * (littleEndian ? i : byteLength - i);
+    const byte = (this >> shift) & 0xFF;
+    array.push(byte);
+  }
+  return Uint8Array.from(array);
+};
 
 async function getCharacteristic(gatt, { serviceId, characteristicId }) {
   const service = await gatt.getPrimaryService(serviceId);
@@ -26,12 +37,39 @@ export default class NotepadCore {
     });
   }
 
-  startScan() {
-    throw new Error("Unsupported");
+  // FIXME Class field not supported in npm package for mini-wechat
+  // _scan
+  async startScan() {
+    navigator.bluetooth.addEventListener(advertiseReceiveEvent, this._onAdvertisementReceived.bind(this));
+    this._scan = await navigator.bluetooth.requestLEScan({ acceptAllAdvertisements: true });
   }
 
   stopScan() {
-    throw new Error("Unsupported");
+    this._scan.stop();
+    navigator.bluetooth.removeEventListener(advertiseReceiveEvent, this._onAdvertisementReceived);
+  }
+
+  _onAdvertisementReceived(event) {
+    console.debug(`_onAdvertisementReceived ${event.device.id}`);
+    this.messageHandler({
+      name: "scanResult",
+      scanResult: {
+        name: event.device.name,
+        deviceId: event.device.id,
+        manufacturerData: this._parseManufacturerData(event),
+        RSSI: event.rssi
+      }
+    });
+  }
+
+  _parseManufacturerData(event) {
+    if (event.manufacturerData.size == 0) return null;
+
+    const [firstKey, firstValue] = event.manufacturerData.entries().next().value;
+    return Uint8Array.from([
+      ...firstKey.toByteArray(2 /*Short.SIZE_BYTES*/),
+      ...new Uint8Array(firstValue.buffer)
+    ]);
   }
 
   async connect(scanResult) {
