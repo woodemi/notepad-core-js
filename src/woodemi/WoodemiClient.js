@@ -13,9 +13,14 @@ export class WoodemiClient extends NotepadClient {
 
   constructor(data) {
     super();
-    const type = data.slice(3, 5);
-    const isCompact = type.startWith(Woodemi.UGEE_CN) || type.startWith(Woodemi.UGEE_GLOBAL);
-    this._woodemiType = isCompact ? Woodemi.typeA1 : Woodemi.typeA1P;
+    if (data) {
+      const type = data.slice(3, 5);
+      const isCompact = type.startWith(Woodemi.UGEE_CN) || type.startWith(Woodemi.UGEE_GLOBAL);
+      this._woodemiType = isCompact ? Woodemi.typeA1 : Woodemi.typeA1P;
+    } else {
+      // FIXME
+      this._woodemiType = Woodemi.typeA1;
+    }
   }
 
   get commandRequestCharacteristic() {
