@@ -9,7 +9,7 @@
     "export": "next export"
   },
   "dependencies": {
-    "next": "9.3.5",
+    "next": "12.1.0",
     "notepad-core": "file:.yalc/notepad-core",
     "react": "16.13.1",
     "react-dom": "16.13.1"
